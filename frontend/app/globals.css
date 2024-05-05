@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --blue: #5976a0;
+  --dark-blue: #334c72
+}
+
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));
+}
+
+::-webkit-scrollbar {
+  height: 2px;
+  width: 0;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #ffffff; 
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d7d7d7;
+  border-radius: 5px;
+}
+
+.gradient {
+  background-color: rgba(0, 0, 0, 0.588);
+}
+
+.all-events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+}
+
+@media (max-width: 1000px) {
+  .all-events-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+@media (max-width: 500px) {
+  .all-events-grid {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Styles for SearchEngine */
+
+.topicsChoiceBox {
+    position: absolute;
+    background-color: white;
+    width: 215px;
+}
+
+.topicsChoiceItem:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+.chosenTopics {
+    display: inline-block;
+}
+
+.navbar-shadow {
+  box-shadow: 1px 5px 30px -11px rgba(0,0,0,0.44);
+}

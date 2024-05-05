@@ -1,0 +1,149 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  logLevel = "silent"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id             String              @id @default(uuid())
+  email          String              @unique
+  password       String
+  full_name      String
+  type           UserType            @default(USER)
+  isUserVisible  Boolean             @default(true)
+  events         Event[] // User can have multiple events
+  resetCodes     ResetPasswordCode[] // User can have multiple reset codes
+  comments       Comment[] // User can have multiple comments
+  commentAnswers CommentAnswer[] // User can have multiple comment answers
+  likes          Like[] // User can have multiple likes
+  tickets        Ticket[] // User can have multiple tickets
+  topics         Topic[] // User can have multiple topics
+}
+
+// ResetPasswordCode model
+model ResetPasswordCode {
+  id             String   @id @default(uuid())
+  userId         String
+  token          String
+  expirationTime DateTime
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
+}
+
+// Event model
+model Event {
+  id         String        @id @default(uuid())
+  userId     String
+  name       String
+  content    String
+  latitude   Float
+  longitude  Float
+  start      DateTime
+  end        DateTime
+  format     EventFormat
+  price      Float         @default(0)
+  maxTickets Int
+  createdAt  DateTime      @default(now())
+  user       User          @relation(fields: [userId], references: [id])
+  topics     EventTopics[] // Event can have multiple topics
+  comments   Comment[] // Event can have multiple comments
+  likes      Like[] // Event can have multiple likes
+  tickets    Ticket[] // Event can have multiple tickets
+}
+
+// Topic model
+model Topic {
+  id        String        @id @default(uuid())
+  name      String
+  userId    String
+  createdAt DateTime      @default(now())
+  user      User          @relation(fields: [userId], references: [id])
+  events    EventTopics[] // Topic can have multiple events
+}
+
+// EventTopics model (many-to-many relationship between Event and Topic)
+model EventTopics {
+  id      String @id @default(uuid())
+  eventId String
+  topicId String
+  event   Event  @relation(fields: [eventId], references: [id])
+  topic   Topic  @relation(fields: [topicId], references: [id])
+}
+
+// Like model
+model Like {
+  id      String @id @default(uuid())
+  eventId String
+  userId  String
+  event   Event  @relation(fields: [eventId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
+}
+
+// Ticket model
+model Ticket {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// Comment model
+model Comment {
+  id        String          @id @default(uuid())
+  eventId   String
+  userId    String
+  text      String
+  createdAt DateTime        @default(now())
+  editedAt  DateTime?
+  comments  CommentAnswer[] // Comment can have multiple answers
+  event     Event           @relation(fields: [eventId], references: [id])
+  user      User            @relation(fields: [userId], references: [id])
+}
+
+// CommentAnswer model
+model CommentAnswer {
+  id        String    @id @default(uuid())
+  commentId String
+  userId    String
+  text      String
+  createdAt DateTime  @default(now())
+  editedAt  DateTime?
+  comment   Comment   @relation(fields: [commentId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+// UserType enum
+enum UserType {
+  ORGANIZATION
+  USER
+}
+
+// EventFormat enum
+enum EventFormat {
+  TRAINING
+  SEMINAR
+  MASTER_CLASS
+  DEBATE
+  PARTY
+  EXHIBITION
+  CARNIVAL
+  CONTEST
+  PARADE
+  PICKET
+  PICNIC
+}
+
+// npx prisma migrate dev -- name init
